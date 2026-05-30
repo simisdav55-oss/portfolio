@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dav_Simis — Python Developer</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0a0a0f; 
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+.avatar {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; margin-bottom: 16px;
+  box-shadow: 0 8px 32px rgba(102,126,234,.3);
+}
+h1 { font-size: 22px; margin-bottom: 4px; }
+.subtitle { color: #8b8b9e; font-size: 14px; margin-bottom: 6px; }
+.badge-row { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:12px 0 24px; }
+.badge {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  color: #a0a0b8; padding: 4px 12px; border-radius: 20px; font-size: 11px;
+}
+.stats { display:flex; gap:24px; margin-bottom:28px; }
+.stat { text-align:center; }
+.stat .n { font-size:18px; font-weight:700; color:#667eea; }
+.stat .l { font-size:10px; color:#6b6b80; text-transform:uppercase; letter-spacing:.5px; }
+.links { width:100%; max-width:380px; display:flex; flex-direction:column; gap:10px; }
+.link-btn {
+  display:flex; align-items:center; gap:12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px; padding: 14px 18px;
+  text-decoration: none; color: #d0d0e0;
+  font-size: 14px; font-weight: 500;
+  transition: all .2s;
+}
+.link-btn:hover {
+  background: rgba(255,255,255,.08);
+  border-color: rgba(102,126,234,.4);
+  transform: translateX(4px);
+}
+.link-btn .icon { font-size:20px; width:28px; text-align:center; }
+.link-btn .arrow { margin-left:auto; color:#4a4a60; }
+.link-btn.primary {
+  background: linear-gradient(135deg, #667eea22, #764ba222);
+  border-color: rgba(102,126,234,.3);
+  color:#fff;
+}
+.link-btn.primary:hover { border-color: rgba(102,126,234,.6); }
+.section-title { 
+  width:100%; max-width:380px; 
+  font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+  color:#4a4a60; margin:28px 0 10px;
+}
+.projects { width:100%; max-width:380px; }
+.project-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 12px; padding:14px 16px; margin-bottom:8px;
+}
+.project-card .name { font-size:13px; font-weight:600; margin-bottom:4px; }
+.project-card .desc { font-size:12px; color:#6b6b80; line-height:1.4; }
+.project-card .stack { display:flex; gap:4px; flex-wrap:wrap; margin-top:6px; }
+.project-card .tag { background:#1a1a2e; color:#5a5a70; padding:2px 8px; border-radius:8px; font-size:10px; }
+footer { margin-top:auto; padding-top:40px; color:#3a3a50; font-size:11px; }
+</style>
+</head>
+<body>
+
+<div class="avatar">🐍</div>
+<h1>Dav_Simis</h1>
+<p class="subtitle">Python Developer · API & Automation</p>
+<p class="subtitle">simisdav55@gmail.com</p>
+
+<div class="badge-row">
+  <span class="badge">Python</span>
+  <span class="badge">FastAPI</span>
+  <span class="badge">Web Scraping</span>
+  <span class="badge">API Integration</span>
+  <span class="badge">WeChat Dev</span>
+  <span class="badge">Docker</span>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="n">3+</div><div class="l">Years</div></div>
+  <div class="stat"><div class="n">50+</div><div class="l">Projects</div></div>
+  <div class="stat"><div class="n">24h</div><div class="l">Response</div></div>
+</div>
+
+<div class="links">
+  <a href="https://simisdav55-oss.github.io/portfolio/" target="_blank" class="link-btn primary">
+    <span class="icon">🌐</span>
+    <span>Full Portfolio (Live)</span>
+    <span class="arrow">→</span>
+  </a>
+  <a href="https://github.com/simisdav55" target="_blank" class="link-btn">
+    <span class="icon">⚡</span>
+    <span>GitHub · simisdav55</span>
+    <span class="arrow">→</span>
+  </a>
+  <a href="https://www.fiverr.com/s/dav_simis" target="_blank" class="link-btn">
+    <span class="icon">🛒</span>
+    <span>Fiverr · Starting $25/hr</span>
+    <span class="arrow">→</span>
+  </a>
+  <a href="https://www.freelancer.com/u/simisdav" target="_blank" class="link-btn">
+    <span class="icon">💼</span>
+    <span>Freelancer.com</span>
+    <span class="arrow">→</span>
+  </a>
+</div>
+
+<p class="section-title">Featured Projects</p>
+<div class="projects">
+  <div class="project-card">
+    <div class="name">🍖 冷链食材配送小程序</div>
+    <div class="desc">WeChat mini-app + Node.js backend for BBQ ingredient subscription. 120 SKU, dual pricing, cold cabinet tracking, WeChat Pay. Full admin panel with batch operations.</div>
+    <div class="stack">
+      <span class="tag">Node.js</span><span class="tag">WeChat</span><span class="tag">SQLite</span><span class="tag">Vue</span>
+    </div>
+  </div>
+  <div class="project-card">
+    <div class="name">🔍 Qdrant Vector Search Engine</div>
+    <div class="desc">FastAPI + Qdrant + MySQL vector similarity search. Includes PHP SDK, MySQL↔Qdrant sync, Docker deploy. Production ready, ¥6,000 project.</div>
+    <div class="stack">
+      <span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Qdrant</span><span class="tag">Docker</span>
+    </div>
+  </div>
+  <div class="project-card">
+    <div class="name">🤖 API Automation (Rentec → Google Sheets)</div>
+    <div class="desc">OAuth2 authenticated scraper that syncs vendor data to Google Sheets on schedule. Error handling, retries, incremental updates.</div>
+    <div class="stack">
+      <span class="tag">Python</span><span class="tag">Google Sheets API</span><span class="tag">OAuth2</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Available for: Python bots · API integration · Data pipelines · WeChat/微信小程序 · RAG systems</p>
+  <p style="margin-top:4px">Email: simisdav55@gmail.com · Response within 24h</p>
+</footer>
+
+</body>
+</html>
