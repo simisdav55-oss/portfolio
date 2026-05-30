@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dav_Simis — Python Developer | API & Automation</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, sans-serif; background:#0d1117; color:#e6edf3; }
+.hero { text-align:center; padding:80px 20px 40px; }
+.hero h1 { font-size:36px; margin-bottom:12px; }
+.hero .tagline { color:#8b949e; font-size:18px; margin-bottom:24px; }
+.hero .badges { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:32px; }
+.badge { background:#1f6feb22; color:#58a6ff; padding:6px 14px; border-radius:20px; font-size:13px; border:1px solid #1f6feb44; }
+.badge.green { background:#1f6fb722; color:#3fb950; border-color:#1f6fb744; }
+.badge.orange { background:#1f6feb22; color:#d29922; border-color:#1f6feb44; }
+.hero .cta { display:inline-block; background:#238636; color:white; padding:14px 36px; border-radius:8px; text-decoration:none; font-size:16px; font-weight:600; margin:8px; }
+.hero .cta.secondary { background:#21262d; color:#c9d1d9; border:1px solid #30363d; }
+.stats { display:flex; gap:40px; justify-content:center; margin:40px 0; }
+.stat { text-align:center; }
+.stat .num { font-size:28px; font-weight:700; color:#58a6ff; }
+.stat .label { font-size:13px; color:#8b949e; margin-top:4px; }
+.section { max-width:960px; margin:0 auto; padding:40px 20px; }
+.section h2 { font-size:22px; margin-bottom:24px; border-bottom:1px solid #30363d; padding-bottom:12px; }
+.project-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+.project-card { background:#161b22; border:1px solid #30363d; border-radius:12px; overflow:hidden; transition:border-color .2s; }
+.project-card:hover { border-color:#58a6ff; }
+.project-thumb { height:160px; background:linear-gradient(135deg,#1a1a2e,#2d1b4e); display:flex; align-items:center; justify-content:center; font-size:64px; }
+.project-body { padding:16px; }
+.project-title { font-size:16px; font-weight:600; margin-bottom:6px; }
+.project-desc { font-size:13px; color:#8b949e; line-height:1.5; margin-bottom:12px; }
+.project-tags { display:flex; gap:6px; flex-wrap:wrap; }
+.tag { background:#21262d; color:#8b949e; padding:2px 10px; border-radius:12px; font-size:11px; }
+.project-link { display:inline-block; margin-top:10px; color:#58a6ff; text-decoration:none; font-size:13px; }
+.skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
+.skill-item { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:14px; text-align:center; font-size:14px; }
+.skill-item .skill-icon { font-size:24px; margin-bottom:6px; }
+.skill-item .skill-name { color:#8b949e; font-size:12px; margin-top:4px; }
+.reviews { display:grid; gap:16px; }
+.review { background:#161b22; border:1px solid #30363d; border-radius:10px; padding:20px; }
+.review .stars { color:#f0b400; font-size:16px; margin-bottom:8px; }
+.review .text { font-size:14px; line-height:1.6; color:#c9d1d9; font-style:italic; }
+.review .author { margin-top:10px; font-size:12px; color:#8b949e; }
+.pricing { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:800px; margin:0 auto; }
+.price-card { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:24px; text-align:center; }
+.price-card.featured { border-color:#238636; background:#0d2118; }
+.price-card .name { font-size:13px; color:#8b949e; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+.price-card .amount { font-size:36px; font-weight:700; color:#58a6ff; }
+.price-card .amount span { font-size:14px; color:#8b949e; font-weight:400; }
+.price-card .desc { font-size:12px; color:#8b949e; margin-top:8px; }
+.price-card ul { text-align:left; margin-top:16px; padding:0 16px; }
+.price-card li { font-size:13px; color:#c9d1d9; margin-bottom:6px; list-style:none; }
+.price-card li::before { content:"✓ "; color:#3fb950; }
+.contact { text-align:center; padding:60px 20px; }
+.contact h2 { font-size:28px; margin-bottom:12px; }
+.contact p { color:#8b949e; margin-bottom:24px; }
+.contact-email { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:16px 24px; display:inline-block; color:#58a6ff; font-size:16px; }
+footer { text-align:center; padding:40px; color:#484f58; font-size:12px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🐍 Python Developer — API & Automation</h1>
+  <p class="tagline">I build reliable Python bots, API integrations, and data pipelines that run 24/7 without babysitting</p>
+  <div class="badges">
+    <span class="badge">Python</span>
+    <span class="badge">FastAPI</span>
+    <span class="badge">API Integration</span>
+    <span class="badge green">Web Scraping</span>
+    <span class="badge">Automation</span>
+    <span class="badge orange">Vector Search / RAG</span>
+    <span class="badge">MySQL / PostgreSQL</span>
+  </div>
+  <a href="https://www.fiverr.com/s/dav_simis" class="cta" target="_blank">View Fiverr Profile →</a>
+  <a href="mailto:simisdav55@gmail.com" class="cta secondary">Email Me</a>
+  <div class="stats">
+    <div class="stat"><div class="num">3+</div><div class="label">Years Python</div></div>
+    <div class="stat"><div class="num">50+</div><div class="label">Projects Delivered</div></div>
+    <div class="stat"><div class="num">24hr</div><div class="label">Response Time</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🔥 Featured Projects</h2>
+  <div class="project-grid">
+    <div class="project-card">
+      <div class="project-thumb">🍖</div>
+      <div class="project-body">
+        <div class="project-title">冷链食材配送系统</div>
+        <div class="project-desc">WeChat mini-app + Node.js backend for a BBQ ingredient subscription service. 120 SKU, dual pricing, cold cabinet tracking, WeChat Pay integration.</div>
+        <div class="project-tags">
+          <span class="tag">Node.js</span><span class="tag">WeChat</span><span class="tag">SQLite</span><span class="tag">Vue.js</span>
+        </div>
+        <a class="project-link" href="https://github.com/simisdav55/bbq-miniprogram" target="_blank">View on GitHub →</a>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-thumb">🔍</div>
+      <div class="project-body">
+        <div class="project-title">Qdrant Vector Search Engine</div>
+        <div class="project-desc">FastAPI + Qdrant + MySQL vector similarity search for short video assets. Includes PHP SDK, MySQL↔Qdrant sync, Docker deploy.</div>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Qdrant</span><span class="tag">RAG</span><span class="tag">Docker</span>
+        </div>
+        <a class="project-link" href="https://github.com/simisdav55/qdrant-search-engine" target="_blank">View on GitHub →</a>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-thumb">🤖</div>
+      <div class="project-body">
+        <div class="project-title">Rentec API → Google Sheets Automation</div>
+        <div class="project-desc">OAuth2 authenticated scraper that syncs vendor data to Google Sheets on a schedule. Handles errors, retries, incremental updates.</div>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">Google Sheets API</span><span class="tag">OAuth2</span><span class="tag">Automation</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-thumb">🅿️</div>
+      <div class="project-body">
+        <div class="project-title">智慧停车系统</div>
+        <div class="project-desc">Full parking lot management system: plate recognition integration, real-time spot tracking, billing, WeChat Pay.</div>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">Vue.js</span><span class="tag">MySQL</span><span class="tag">WeChat Pay</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>⚡ Tech Stack</h2>
+  <div class="skills-grid">
+    <div class="skill-item"><div class="skill-icon">🐍</div><div>Python</div><div class="skill-name">FastAPI, Flask, Scrapy</div></div>
+    <div class="skill-item"><div class="skill-icon">🍃</div><div>Node.js</div><div class="skill-name">Express, Koa, NPM</div></div>
+    <div class="skill-item"><div class="skill-icon">🗄️</div><div>Databases</div><div class="skill-name">MySQL, PostgreSQL, SQLite, Redis</div></div>
+    <div class="skill-item"><div class="skill-icon">🌐</div><div>Web Scraping</div><div class="skill-name">Selenium, Playwright, BeautifulSoup</div></div>
+    <div class="skill-item"><div class="skill-icon">🔌</div><div>API Integration</div><div class="skill-name">REST, OAuth2, Webhooks</div></div>
+    <div class="skill-item"><div class="skill-icon">🐳</div><div>DevOps</div><div class="skill-name">Docker, Linux, Nginx, GitHub Actions</div></div>
+    <div class="skill-item"><div class="skill-icon">🤖</div><div>AI / RAG</div><div class="skill-name">LangChain, Qdrant, OpenAI API</div></div>
+    <div class="skill-item"><div class="skill-icon">💚</div><div>Google Cloud</div><div class="skill-name">Sheets API, Drive API</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>💰 Services & Pricing</h2>
+  <div class="pricing">
+    <div class="price-card">
+      <div class="name">Basic</div>
+      <div class="amount">$25<span> / hour</span></div>
+      <div class="desc">Simple automation & scripts</div>
+      <ul>
+        <li>Web scraping bot</li>
+        <li>API integration</li>
+        <li>Data processing script</li>
+        <li>Email/code delivery</li>
+      </ul>
+    </div>
+    <div class="price-card featured">
+      <div class="name">Standard ★</div>
+      <div class="amount">$40<span> / hour</span></div>
+      <div class="desc">Full backend & integration</div>
+      <ul>
+        <li>REST API development</li>
+        <li>Database design</li>
+        <li>OAuth2 / 3rd party auth</li>
+        <li>Git repo + documentation</li>
+      </ul>
+    </div>
+    <div class="price-card">
+      <div class="name">Premium</div>
+      <div class="amount">$60<span> / hour</span></div>
+      <div class="desc">Complex systems & AI</div>
+      <ul>
+        <li>RAG / Vector search</li>
+        <li>Real-time data pipelines</li>
+        <li>Deployment + monitoring</li>
+        <li>Source + 30-day support</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>📋 Client Reviews</h2>
+  <div class="reviews">
+    <div class="review">
+      <div class="stars">★★★★★</div>
+      <div class="text">"Delivered exactly what I needed — a Python script that scrapes 12 vendor sites and updates our Google Sheet every hour. No drama, works perfectly."</div>
+      <div class="author">— Business owner, Singapore (via Fiverr)</div>
+    </div>
+    <div class="review">
+      <div class="stars">★★★★★</div>
+      <div class="text">"Fast, reliable, and communicated clearly throughout. The FastAPI backend was production-ready with proper error handling and tests."</div>
+      <div class="author">— Startup founder, USA (via Freelancer.com)</div>
+    </div>
+  </div>
+</div>
+
+<div class="contact">
+  <h2>Let's Talk</h2>
+  <p>Ready to start? Message me on Fiverr or email directly.</p>
+  <div class="contact-email">📧 simisdav55@gmail.com</div>
+  <div style="margin-top:16px">
+    <a href="https://www.fiverr.com/s/dav_simis" class="cta" target="_blank" style="background:#1d9bf0">Fiverr →</a>
+    <a href="https://www.freelancer.com/u/simisdav" class="cta secondary" target="_blank">Freelancer →</a>
+  </div>
+</div>
+
+<footer>
+  <p>Dav_Simis · Python Developer · simisdav55@gmail.com</p>
+  <p style="margin-top:4px">Available for: Python bots · API integration · Data pipelines · RAG systems · WeChat/微信开发</p>
+</footer>
+
+</body>
+</html>

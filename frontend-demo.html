@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>客串云仓 - 烧烤食材订货（演示版）</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --primary:#FF6B35;--primary-light:#FF8F5E;--bg:#f5f5f5;--card:#ffffff;
+  --text:#333;--text-light:#999;--border:#eee;--green:#2ecc71;--red:#e74c3c;
+  --bbq:#FF6B35;--veg:#27ae60;
+}
+body { font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif; background:var(--bg); color:var(--text); }
+.app { max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;position:relative; }
+.app-header { background:linear-gradient(135deg,var(--primary),#e85d2c);padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center;color:white; }
+.app-header h1 { font-size:18px;font-weight:600; }
+.demo-badge { background:rgba(255,255,255,0.25);padding:2px 10px;border-radius:10px;font-size:11px;margin-left:8px; }
+.header-actions { display:flex;gap:10px; }
+.header-btn { background:rgba(255,255,255,0.2);border:none;color:white;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center; }
+.tab-bar { position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:white;display:flex;border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0);z-index:100;height:54px; }
+.tab-item { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-light);font-size:10px;cursor:pointer;transition:.2s; }
+.tab-item.active { color:var(--primary); }
+.tab-item .tab-icon { font-size:20px;margin-bottom:1px; }
+.tab-badge { position:absolute;top:2px;right:50%;margin-right:-22px;background:var(--red);color:white;font-size:10px;min-width:16px;height:16px;border-radius:8px;text-align:center;line-height:16px;padding:0 4px; }
+.page { display:none;padding-bottom:70px; }
+.page.active { display:block; }
+.line-filter { display:flex;gap:8px;padding:10px 16px;background:white; }
+.line-btn { flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);text-align:center;font-size:13px;cursor:pointer;background:white; }
+.line-btn.active-bbq { border-color:var(--bbq);color:var(--bbq);background:#fff5f0; }
+.line-btn.active-veg { border-color:var(--veg);color:var(--veg);background:#f0fff4; }
+.category-tabs { display:flex;overflow-x:auto;gap:8px;padding:8px 16px;background:white; }
+.category-tabs::-webkit-scrollbar { display:none; }
+.cat-tab { white-space:nowrap;padding:6px 14px;border-radius:16px;font-size:13px;background:var(--bg);color:var(--text-light);cursor:pointer;flex-shrink:0; }
+.cat-tab.active { background:var(--primary);color:white; }
+.product-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px; }
+.product-card { background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.product-img { width:100%;aspect-ratio:1;background:linear-gradient(135deg,#fff5f0,#fff0e6);display:flex;align-items:center;justify-content:center;font-size:48px; }
+.product-info { padding:10px; }
+.product-name { font-size:13px;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+.product-unit { font-size:11px;color:var(--text-light);margin-top:2px; }
+.product-price-row { display:flex;align-items:center;justify-content:space-between;margin-top:6px; }
+.price-current { font-size:18px;font-weight:700;color:var(--red); }
+.price-current .currency { font-size:12px; }
+.price-original { font-size:12px;color:var(--text-light);text-decoration:line-through;margin-left:4px; }
+.product-add { width:28px;height:28px;border-radius:50%;background:var(--primary);color:white;border:none;font-size:18px;line-height:28px;text-align:center;cursor:pointer;flex-shrink:0; }
+.product-add:disabled { background:#ccc;cursor:not-allowed; }
+.cat-label { font-size:10px;background:#fff0e6;color:var(--primary);padding:1px 6px;border-radius:8px;display:inline-block;margin-bottom:4px; }
+.cart-section { margin:12px 16px;background:white;border-radius:12px;overflow:hidden; }
+.cart-section-header { padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);font-weight:600;font-size:14px; }
+.cart-section-header .cutoff { font-size:12px;color:var(--text-light);font-weight:400; }
+.cart-item { display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid #f8f8f8; }
+.cart-item-name { flex:1;font-size:14px; }
+.cart-item-price { font-size:14px;color:var(--red);font-weight:600;margin-right:8px;white-space:nowrap; }
+.cart-qty { display:flex;align-items:center;gap:6px; }
+.qty-btn { width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:white;font-size:16px;line-height:26px;text-align:center;cursor:pointer;color:var(--text); }
+.qty-val { font-size:15px;font-weight:500;min-width:20px;text-align:center; }
+.cart-line-bbq { border-left:3px solid var(--bbq); }
+.cart-line-veg { border-left:3px solid var(--veg); }
+.cart-empty { text-align:center;padding:60px 20px;color:var(--text-light);font-size:14px; }
+.cart-empty .empty-icon { font-size:64px;margin-bottom:12px; }
+.cart-bottom { position:fixed;bottom:54px;left:0;right:0;max-width:430px;margin:0 auto;background:white;padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));display:none;align-items:center;gap:12px;border-top:1px solid var(--border);box-shadow:0 -2px 10px rgba(0,0,0,0.05);z-index:99; }
+.cart-bottom.show { display:flex; }
+.cart-total { flex:1; }
+.cart-total-label { font-size:12px;color:var(--text-light); }
+.cart-total-amount { font-size:22px;font-weight:700;color:var(--red); }
+.cart-total-amount .currency { font-size:14px; }
+.btn-checkout { background:var(--primary);color:white;border:none;padding:12px 28px;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer; }
+.btn-checkout:disabled { background:#ccc;cursor:not-allowed; }
+.order-card { background:white;margin:8px 16px;border-radius:12px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.05); }
+.order-header { display:flex;justify-content:space-between;margin-bottom:8px; }
+.order-no { font-size:12px;color:var(--text-light); }
+.order-status { font-size:12px;padding:2px 8px;border-radius:10px; }
+.status-pending { background:#fff8e1;color:#f57f17; }
+.status-paid { background:#e8f5e9;color:#2e7d32; }
+.status-processing { background:#e3f2fd;color:#1565c0; }
+.status-delivering { background:#f3e5f5;color:#7b1fa2; }
+.status-delivered { background:#e8f5e9;color:#2e7d32; }
+.status-completed { background:#f5f5f5;color:#616161; }
+.status-cancelled { background:#fce4ec;color:#c62828; }
+.order-items { font-size:13px;color:var(--text-light);margin-bottom:6px; }
+.order-total { font-size:16px;font-weight:600;color:var(--red); }
+.order-time { font-size:11px;color:var(--text-light);margin-top:4px; }
+.order-empty { text-align:center;padding:60px 20px;color:var(--text-light); }
+.order-empty .empty-icon { font-size:64px;margin-bottom:12px; }
+.profile-card { background:linear-gradient(135deg,var(--primary),#e85d2c);padding:30px 20px;color:white;text-align:center; }
+.profile-avatar { width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:32px; }
+.profile-name { font-size:18px;font-weight:600; }
+.profile-type { font-size:12px;opacity:0.8;margin-top:4px; }
+.profile-switch { display:inline-block;margin-top:8px;padding:4px 14px;background:rgba(255,255,255,0.2);border-radius:12px;font-size:12px;cursor:pointer;border:none;color:white; }
+.profile-menu { background:white;margin:12px 16px;border-radius:12px;overflow:hidden; }
+.profile-menu-item { display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);font-size:14px;cursor:pointer; }
+.profile-menu-item:last-child { border-bottom:none; }
+.profile-menu-item .arrow { color:var(--text-light); }
+.toast { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.75);color:white;padding:12px 24px;border-radius:8px;font-size:14px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s; }
+.toast.show { opacity:1; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="app-header">
+    <div style="display:flex;align-items:center">
+      <h1>🔥 客串云仓</h1>
+      <span class="demo-badge">演示版</span>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="switchUser()" title="切换账号">👤</button>
+    </div>
+  </div>
+  <div id="page-products" class="page active">
+    <div class="line-filter">
+      <button id="line-bbq" class="line-btn active-bbq" onclick="setLine('bbq')">🔥 烧烤食材</button>
+      <button id="line-veg" class="line-btn" onclick="setLine('veg')">🥬 净菜/饮品</button>
+    </div>
+    <div class="category-tabs" id="categoryTabs"></div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+  <div id="page-cart" class="page"><div id="cartContent"></div></div>
+  <div id="page-orders" class="page"><div id="orderContent"></div></div>
+  <div id="page-profile" class="page"><div id="profileContent"></div></div>
+  <div class="cart-bottom" id="cartBottom">
+    <div class="cart-total"><div class="cart-total-label">合计</div><div class="cart-total-amount"><span class="currency">¥</span><span id="cartTotal">0</span></div></div>
+    <button class="btn-checkout" id="btnCheckout" onclick="checkout()">去结算</button>
+  </div>
+  <div class="tab-bar">
+    <div class="tab-item active" onclick="switchTab('products')"><span class="tab-icon">🏪</span><span>选购</span></div>
+    <div class="tab-item" onclick="switchTab('cart')"><span class="tab-icon">🛒</span><span>购物车</span><span class="tab-badge" id="cartBadge" style="display:none">0</span></div>
+    <div class="tab-item" onclick="switchTab('orders')"><span class="tab-icon">📋</span><span>订单</span></div>
+    <div class="tab-item" onclick="switchTab('profile')"><span class="tab-icon">👤</span><span>我的</span></div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+<script>
+const ALL_CATS = [{"id": 1, "name": "经典烧烤串", "icon": "🍖"}, {"id": 2, "name": "特色净菜", "icon": "🥬"}, {"id": 3, "name": "腌制肉类", "icon": "🥩"}, {"id": 4, "name": "海鲜水产", "icon": "🦐"}, {"id": 5, "name": "蔬菜菌菇", "icon": "🥦"}, {"id": 6, "name": "豆制品/面点", "icon": "🧈"}, {"id": 7, "name": "调料酱料", "icon": "🧂"}, {"id": 8, "name": "水果切盒", "icon": "🍉"}, {"id": 9, "name": "饮品冷饮", "icon": "🥤"}, {"id": 10, "name": "烧烤套餐", "icon": "📦"}, {"id": 11, "name": "火锅食材", "icon": "🫕"}, {"id": 12, "name": "熟食凉菜", "icon": "🥗"}];
+const ALL_PRODUCTS = [{"id": 1, "category_id": 1, "name": "秘制羊肉串", "unit": "半手(5串)", "regular_price": 35, "pro_price": 28, "stock": 347, "initial_stock": 347, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 2, "category_id": 1, "name": "炭烤牛肉串", "unit": "把(10串)", "regular_price": 38, "pro_price": 30, "stock": 211, "initial_stock": 211, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 3, "category_id": 1, "name": "孜然鸡胗串", "unit": "把(10串)", "regular_price": 28, "pro_price": 22, "stock": 205, "initial_stock": 205, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 4, "category_id": 1, "name": "蜜汁鸡翅串", "unit": "把(6串)", "regular_price": 32, "pro_price": 26, "stock": 378, "initial_stock": 378, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 5, "category_id": 1, "name": "麻辣排骨串", "unit": "把(8串)", "regular_price": 42, "pro_price": 34, "stock": 150, "initial_stock": 150, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 6, "category_id": 1, "name": "蒜香五花肉串", "unit": "把(10串)", "regular_price": 30, "pro_price": 24, "stock": 255, "initial_stock": 255, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 7, "category_id": 1, "name": "黑椒牛柳串", "unit": "把(8串)", "regular_price": 45, "pro_price": 36, "stock": 161, "initial_stock": 161, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 8, "category_id": 1, "name": "香辣鱿鱼须串", "unit": "把(10串)", "regular_price": 26, "pro_price": 20, "stock": 364, "initial_stock": 364, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 9, "category_id": 1, "name": "奥尔良烤翅", "unit": "把(6串)", "regular_price": 28, "pro_price": 22, "stock": 463, "initial_stock": 463, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 10, "category_id": 1, "name": "藤椒鸡柳串", "unit": "把(10串)", "regular_price": 25, "pro_price": 20, "stock": 251, "initial_stock": 251, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 11, "category_id": 1, "name": "原味猪肉串", "unit": "把(10串)", "regular_price": 24, "pro_price": 19, "stock": 217, "initial_stock": 217, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 12, "category_id": 1, "name": "彩椒牛肉串", "unit": "把(8串)", "regular_price": 40, "pro_price": 32, "stock": 192, "initial_stock": 192, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 13, "category_id": 1, "name": "香茅鸡腿肉串", "unit": "把(6串)", "regular_price": 35, "pro_price": 28, "stock": 257, "initial_stock": 257, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 14, "category_id": 1, "name": "泡椒牛肉串", "unit": "把(8串)", "regular_price": 36, "pro_price": 29, "stock": 399, "initial_stock": 399, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 15, "category_id": 1, "name": "蜜汁猪颈肉串", "unit": "把(8串)", "regular_price": 34, "pro_price": 27, "stock": 331, "initial_stock": 331, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 16, "category_id": 1, "name": "咖喱鸡肉串", "unit": "把(10串)", "regular_price": 28, "pro_price": 22, "stock": 483, "initial_stock": 483, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 17, "category_id": 1, "name": "黑椒烤肠串", "unit": "把(6串)", "regular_price": 20, "pro_price": 16, "stock": 371, "initial_stock": 371, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 18, "category_id": 1, "name": "蒜蓉虾滑串", "unit": "把(6串)", "regular_price": 38, "pro_price": 30, "stock": 263, "initial_stock": 263, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 19, "category_id": 1, "name": "鱼豆腐串", "unit": "把(10串)", "regular_price": 15, "pro_price": 12, "stock": 458, "initial_stock": 458, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 20, "category_id": 1, "name": "面筋串", "unit": "把(10串)", "regular_price": 12, "pro_price": 10, "stock": 173, "initial_stock": 173, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 36, "category_id": 3, "name": "秘制烤五花肉(腌制)", "unit": "份(500g)", "regular_price": 32, "pro_price": 26, "stock": 347, "initial_stock": 347, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 37, "category_id": 3, "name": "奥尔良烤鸡腿(腌制)", "unit": "份(3只)", "regular_price": 28, "pro_price": 22, "stock": 404, "initial_stock": 404, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 38, "category_id": 3, "name": "黑椒牛仔骨(腌制)", "unit": "份(400g)", "regular_price": 58, "pro_price": 46, "stock": 151, "initial_stock": 151, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 39, "category_id": 3, "name": "蒜香排骨(腌制)", "unit": "份(500g)", "regular_price": 42, "pro_price": 34, "stock": 107, "initial_stock": 107, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 40, "category_id": 3, "name": "蜜汁叉烧肉(腌制)", "unit": "份(400g)", "regular_price": 36, "pro_price": 29, "stock": 167, "initial_stock": 167, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 41, "category_id": 3, "name": "麻辣牛肉(腌制)", "unit": "份(400g)", "regular_price": 45, "pro_price": 36, "stock": 443, "initial_stock": 443, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 42, "category_id": 3, "name": "照烧鸡腿(腌制)", "unit": "份(3只)", "regular_price": 26, "pro_price": 21, "stock": 334, "initial_stock": 334, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 43, "category_id": 3, "name": "孜然羊排(腌制)", "unit": "份(500g)", "regular_price": 55, "pro_price": 44, "stock": 383, "initial_stock": 383, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 44, "category_id": 3, "name": "韩式烤肉(腌制)", "unit": "份(400g)", "regular_price": 38, "pro_price": 30, "stock": 124, "initial_stock": 124, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 45, "category_id": 3, "name": "藤椒鸡翅(腌制)", "unit": "份(8只)", "regular_price": 30, "pro_price": 24, "stock": 186, "initial_stock": 186, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 46, "category_id": 3, "name": "BBQ猪肋排(腌制)", "unit": "份(500g)", "regular_price": 48, "pro_price": 38, "stock": 391, "initial_stock": 391, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 47, "category_id": 3, "name": "香草羊排(腌制)", "unit": "份(400g)", "regular_price": 52, "pro_price": 42, "stock": 106, "initial_stock": 106, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 48, "category_id": 4, "name": "大虾(去虾线)", "unit": "份(500g)", "regular_price": 45, "pro_price": 36, "stock": 68, "initial_stock": 68, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 49, "category_id": 4, "name": "蒜蓉生蚝", "unit": "份(6只)", "regular_price": 38, "pro_price": 30, "stock": 212, "initial_stock": 212, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 50, "category_id": 4, "name": "扇贝(粉丝蒜蓉)", "unit": "份(8只)", "regular_price": 42, "pro_price": 34, "stock": 319, "initial_stock": 319, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 51, "category_id": 4, "name": "鱿鱼须(腌制)", "unit": "份(400g)", "regular_price": 22, "pro_price": 18, "stock": 453, "initial_stock": 453, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 52, "category_id": 4, "name": "秋刀鱼(处理)", "unit": "份(3条)", "regular_price": 20, "pro_price": 16, "stock": 442, "initial_stock": 442, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 53, "category_id": 4, "name": "多春鱼(处理)", "unit": "份(300g)", "regular_price": 24, "pro_price": 19, "stock": 293, "initial_stock": 293, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 54, "category_id": 4, "name": "蛤蜊(吐沙)", "unit": "份(500g)", "regular_price": 15, "pro_price": 12, "stock": 439, "initial_stock": 439, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 55, "category_id": 4, "name": "鲍鱼(小)", "unit": "份(6只)", "regular_price": 68, "pro_price": 54, "stock": 227, "initial_stock": 227, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 56, "category_id": 4, "name": "鳗鱼(蒲烧)", "unit": "份(300g)", "regular_price": 55, "pro_price": 44, "stock": 156, "initial_stock": 156, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 57, "category_id": 4, "name": "鱿鱼整只(处理)", "unit": "份(2只)", "regular_price": 26, "pro_price": 20, "stock": 217, "initial_stock": 217, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 58, "category_id": 5, "name": "金针菇", "unit": "份(200g)", "regular_price": 8, "pro_price": 6, "stock": 129, "initial_stock": 129, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 59, "category_id": 5, "name": "香菇(切片)", "unit": "份(200g)", "regular_price": 10, "pro_price": 8, "stock": 70, "initial_stock": 70, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 60, "category_id": 5, "name": "土豆片", "unit": "份(400g)", "regular_price": 6, "pro_price": 5, "stock": 456, "initial_stock": 456, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 61, "category_id": 5, "name": "茄子(整条)", "unit": "份(2根)", "regular_price": 8, "pro_price": 6, "stock": 499, "initial_stock": 499, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 62, "category_id": 5, "name": "玉米(切段)", "unit": "份(3段)", "regular_price": 9, "pro_price": 7, "stock": 206, "initial_stock": 206, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 63, "category_id": 5, "name": "青椒(整只)", "unit": "份(300g)", "regular_price": 6, "pro_price": 5, "stock": 213, "initial_stock": 213, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 64, "category_id": 5, "name": "韭菜(捆)", "unit": "份(200g)", "regular_price": 7, "pro_price": 5, "stock": 148, "initial_stock": 148, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 65, "category_id": 5, "name": "蘑菇(切片)", "unit": "份(200g)", "regular_price": 9, "pro_price": 7, "stock": 307, "initial_stock": 307, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 66, "category_id": 5, "name": "莲藕片", "unit": "份(300g)", "regular_price": 8, "pro_price": 6, "stock": 63, "initial_stock": 63, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 67, "category_id": 5, "name": "杏鲍菇(切片)", "unit": "份(200g)", "regular_price": 10, "pro_price": 8, "stock": 109, "initial_stock": 109, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 68, "category_id": 6, "name": "千张(切条)", "unit": "份(200g)", "regular_price": 6, "pro_price": 5, "stock": 399, "initial_stock": 399, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 69, "category_id": 6, "name": "豆腐泡", "unit": "份(200g)", "regular_price": 5, "pro_price": 4, "stock": 267, "initial_stock": 267, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 70, "category_id": 6, "name": "烤馕", "unit": "份(2个)", "regular_price": 8, "pro_price": 6, "stock": 272, "initial_stock": 272, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 71, "category_id": 6, "name": "馒头片", "unit": "份(8片)", "regular_price": 4, "pro_price": 3, "stock": 71, "initial_stock": 71, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 72, "category_id": 6, "name": "年糕片", "unit": "份(300g)", "regular_price": 8, "pro_price": 6, "stock": 257, "initial_stock": 257, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 73, "category_id": 6, "name": "腐竹(泡好)", "unit": "份(200g)", "regular_price": 7, "pro_price": 5, "stock": 314, "initial_stock": 314, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 74, "category_id": 6, "name": "豆皮结", "unit": "份(200g)", "regular_price": 6, "pro_price": 5, "stock": 442, "initial_stock": 442, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 75, "category_id": 6, "name": "糯米藕", "unit": "份(300g)", "regular_price": 12, "pro_price": 10, "stock": 373, "initial_stock": 373, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 76, "category_id": 7, "name": "烧烤酱(原味)", "unit": "瓶(200ml)", "regular_price": 10, "pro_price": 8, "stock": 109, "initial_stock": 109, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 77, "category_id": 7, "name": "烧烤酱(辣味)", "unit": "瓶(200ml)", "regular_price": 10, "pro_price": 8, "stock": 56, "initial_stock": 56, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 78, "category_id": 7, "name": "孜然粉", "unit": "瓶(50g)", "regular_price": 6, "pro_price": 5, "stock": 280, "initial_stock": 280, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 79, "category_id": 7, "name": "辣椒粉", "unit": "瓶(50g)", "regular_price": 6, "pro_price": 5, "stock": 249, "initial_stock": 249, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 80, "category_id": 7, "name": "蒜蓉酱", "unit": "瓶(150g)", "regular_price": 8, "pro_price": 6, "stock": 313, "initial_stock": 313, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 81, "category_id": 7, "name": "花生酱", "unit": "瓶(200g)", "regular_price": 12, "pro_price": 10, "stock": 197, "initial_stock": 197, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 82, "category_id": 7, "name": "蜂蜜(烧烤用)", "unit": "瓶(150g)", "regular_price": 15, "pro_price": 12, "stock": 118, "initial_stock": 118, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 83, "category_id": 7, "name": "烤肉蘸料(干碟)", "unit": "袋(30g×3)", "regular_price": 8, "pro_price": 6, "stock": 217, "initial_stock": 217, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 100, "category_id": 10, "name": "2人烧烤套餐A", "unit": "套", "regular_price": 128, "pro_price": 108, "stock": 171, "initial_stock": 171, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 101, "category_id": 10, "name": "2人烧烤套餐B(豪华)", "unit": "套", "regular_price": 188, "pro_price": 158, "stock": 394, "initial_stock": 394, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 102, "category_id": 10, "name": "4人家庭套餐", "unit": "套", "regular_price": 258, "pro_price": 218, "stock": 248, "initial_stock": 248, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 103, "category_id": 10, "name": "6人聚会套餐", "unit": "套", "regular_price": 388, "pro_price": 328, "stock": 363, "initial_stock": 363, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 104, "category_id": 10, "name": "8人豪华套餐", "unit": "套", "regular_price": 528, "pro_price": 448, "stock": 472, "initial_stock": 472, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 105, "category_id": 10, "name": "素食烧烤套餐", "unit": "套", "regular_price": 98, "pro_price": 78, "stock": 490, "initial_stock": 490, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 106, "category_id": 10, "name": "海鲜烧烤套餐", "unit": "套", "regular_price": 198, "pro_price": 168, "stock": 205, "initial_stock": 205, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 107, "category_id": 10, "name": "儿童烧烤套餐", "unit": "套", "regular_price": 68, "pro_price": 58, "stock": 488, "initial_stock": 488, "line_type": "bbq", "cutoff_time": "17:00"}, {"id": 21, "category_id": 2, "name": "手撕包菜(预切)", "unit": "份(500g)", "regular_price": 12, "pro_price": 9, "stock": 215, "initial_stock": 215, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 22, "category_id": 2, "name": "蒜蓉空心菜(预切)", "unit": "份(400g)", "regular_price": 10, "pro_price": 8, "stock": 112, "initial_stock": 112, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 23, "category_id": 2, "name": "清炒豆苗(预洗)", "unit": "份(300g)", "regular_price": 14, "pro_price": 11, "stock": 235, "initial_stock": 235, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 24, "category_id": 2, "name": "韭菜鸡蛋(配好)", "unit": "份(400g)", "regular_price": 13, "pro_price": 10, "stock": 127, "initial_stock": 127, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 25, "category_id": 2, "name": "酸辣土豆丝(预切)", "unit": "份(500g)", "regular_price": 9, "pro_price": 7, "stock": 281, "initial_stock": 281, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 26, "category_id": 2, "name": "鱼香茄子(配好)", "unit": "份(500g)", "regular_price": 14, "pro_price": 11, "stock": 316, "initial_stock": 316, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 27, "category_id": 2, "name": "干煸四季豆(预切)", "unit": "份(400g)", "regular_price": 11, "pro_price": 8, "stock": 169, "initial_stock": 169, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 28, "category_id": 2, "name": "蚝油生菜(预洗)", "unit": "份(300g)", "regular_price": 9, "pro_price": 7, "stock": 451, "initial_stock": 451, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 29, "category_id": 2, "name": "西红柿炒蛋(配好)", "unit": "份(500g)", "regular_price": 13, "pro_price": 10, "stock": 133, "initial_stock": 133, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 30, "category_id": 2, "name": "青椒肉丝(配好)", "unit": "份(400g)", "regular_price": 18, "pro_price": 14, "stock": 290, "initial_stock": 290, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 31, "category_id": 2, "name": "麻婆豆腐(配酱)", "unit": "份(400g)", "regular_price": 10, "pro_price": 8, "stock": 290, "initial_stock": 290, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 32, "category_id": 2, "name": "西兰花炒虾仁(配好)", "unit": "份(350g)", "regular_price": 25, "pro_price": 20, "stock": 325, "initial_stock": 325, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 33, "category_id": 2, "name": "宫保鸡丁(配好)", "unit": "份(400g)", "regular_price": 22, "pro_price": 18, "stock": 163, "initial_stock": 163, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 34, "category_id": 2, "name": "糖醋里脊(配好)", "unit": "份(400g)", "regular_price": 24, "pro_price": 19, "stock": 492, "initial_stock": 492, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 35, "category_id": 2, "name": "回锅肉(配好)", "unit": "份(400g)", "regular_price": 22, "pro_price": 18, "stock": 251, "initial_stock": 251, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 84, "category_id": 8, "name": "西瓜切盒", "unit": "盒(500g)", "regular_price": 12, "pro_price": 10, "stock": 234, "initial_stock": 234, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 85, "category_id": 8, "name": "哈密瓜切盒", "unit": "盒(400g)", "regular_price": 14, "pro_price": 11, "stock": 113, "initial_stock": 113, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 86, "category_id": 8, "name": "菠萝切块", "unit": "盒(300g)", "regular_price": 10, "pro_price": 8, "stock": 82, "initial_stock": 82, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 87, "category_id": 8, "name": "葡萄(洗好)", "unit": "盒(300g)", "regular_price": 15, "pro_price": 12, "stock": 430, "initial_stock": 430, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 88, "category_id": 8, "name": "草莓(精选)", "unit": "盒(250g)", "regular_price": 22, "pro_price": 18, "stock": 333, "initial_stock": 333, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 89, "category_id": 8, "name": "芒果切盒", "unit": "盒(300g)", "regular_price": 18, "pro_price": 14, "stock": 225, "initial_stock": 225, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 90, "category_id": 8, "name": "混合水果拼盘", "unit": "盒(500g)", "regular_price": 25, "pro_price": 20, "stock": 112, "initial_stock": 112, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 91, "category_id": 8, "name": "蓝莓(洗好)", "unit": "盒(125g)", "regular_price": 20, "pro_price": 16, "stock": 238, "initial_stock": 238, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 92, "category_id": 9, "name": "王老吉凉茶", "unit": "罐(310ml)", "regular_price": 5, "pro_price": 4, "stock": 314, "initial_stock": 314, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 93, "category_id": 9, "name": "可乐", "unit": "瓶(500ml)", "regular_price": 4, "pro_price": 3, "stock": 226, "initial_stock": 226, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 94, "category_id": 9, "name": "雪碧", "unit": "瓶(500ml)", "regular_price": 4, "pro_price": 3, "stock": 242, "initial_stock": 242, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 95, "category_id": 9, "name": "矿泉水", "unit": "瓶(550ml)", "regular_price": 2, "pro_price": 1.5, "stock": 468, "initial_stock": 468, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 96, "category_id": 9, "name": "柠檬茶", "unit": "盒(310ml)", "regular_price": 5, "pro_price": 4, "stock": 369, "initial_stock": 369, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 97, "category_id": 9, "name": "椰汁", "unit": "瓶(330ml)", "regular_price": 8, "pro_price": 6, "stock": 176, "initial_stock": 176, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 98, "category_id": 9, "name": "酸奶(原味)", "unit": "瓶(200g)", "regular_price": 6, "pro_price": 5, "stock": 470, "initial_stock": 470, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 99, "category_id": 9, "name": "啤酒(青岛)", "unit": "罐(500ml)", "regular_price": 6, "pro_price": 5, "stock": 307, "initial_stock": 307, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 108, "category_id": 11, "name": "肥牛卷", "unit": "盒(300g)", "regular_price": 38, "pro_price": 30, "stock": 96, "initial_stock": 96, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 109, "category_id": 11, "name": "羊肉卷", "unit": "盒(300g)", "regular_price": 42, "pro_price": 34, "stock": 192, "initial_stock": 192, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 110, "category_id": 11, "name": "虾滑", "unit": "盒(200g)", "regular_price": 28, "pro_price": 22, "stock": 481, "initial_stock": 481, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 111, "category_id": 11, "name": "鱼丸", "unit": "份(300g)", "regular_price": 16, "pro_price": 13, "stock": 54, "initial_stock": 54, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 112, "category_id": 11, "name": "牛肉丸", "unit": "份(300g)", "regular_price": 22, "pro_price": 18, "stock": 169, "initial_stock": 169, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 113, "category_id": 11, "name": "蟹棒", "unit": "份(250g)", "regular_price": 14, "pro_price": 11, "stock": 92, "initial_stock": 92, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 114, "category_id": 11, "name": "腐竹(火锅专用)", "unit": "份(200g)", "regular_price": 8, "pro_price": 6, "stock": 299, "initial_stock": 299, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 115, "category_id": 11, "name": "宽粉", "unit": "份(300g)", "regular_price": 7, "pro_price": 5, "stock": 85, "initial_stock": 85, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 116, "category_id": 12, "name": "凉拌黄瓜", "unit": "盒(300g)", "regular_price": 10, "pro_price": 8, "stock": 222, "initial_stock": 222, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 117, "category_id": 12, "name": "口水鸡", "unit": "盒(300g)", "regular_price": 22, "pro_price": 18, "stock": 167, "initial_stock": 167, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 118, "category_id": 12, "name": "凉拌木耳", "unit": "盒(200g)", "regular_price": 12, "pro_price": 10, "stock": 392, "initial_stock": 392, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 119, "category_id": 12, "name": "卤牛肉(切片)", "unit": "盒(200g)", "regular_price": 35, "pro_price": 28, "stock": 225, "initial_stock": 225, "line_type": "veg", "cutoff_time": "15:00"}, {"id": 120, "category_id": 12, "name": "泡椒凤爪", "unit": "盒(200g)", "regular_price": 15, "pro_price": 12, "stock": 196, "initial_stock": 196, "line_type": "veg", "cutoff_time": "15:00"}];
+const DEMO_ORDERS = [{"order_no": "BBQ2026053001", "status": "delivering", "items": [{"product_name": "秘制羊肉串×2", "display_price": 56}, {"product_name": "炭烤牛肉串×1", "display_price": 38}], "pay_amount": 94, "created_at": "2026-05-30 10:30"}, {"order_no": "BBQ2026052908", "status": "completed", "items": [{"product_name": "蜜汁鸡翅串×3", "display_price": 96}], "pay_amount": 96, "created_at": "2026-05-29 18:22"}, {"order_no": "BBQ2026052905", "status": "delivered", "items": [{"product_name": "孜然羊排×2", "display_price": 76}, {"product_name": "烤生蚝×4", "display_price": 120}], "pay_amount": 196, "created_at": "2026-05-29 14:15"}];
+const EMOJIS = ['🍖','🥩','🍗','🦐','🦪','🥬','🥦','🧂','🍉','🥤','📦','🫕','🥗','🌽','🍄','🥟','🍞','🥜','🍠'];
+const STATUS_MAP = {'pending':'待付款','paid':'已付款','processing':'加工中','delivering':'配送中','delivered':'已到货','completed':'已完成','cancelled':'已取消'};
+
+let state = {
+  categories: ALL_CATS,
+  products: ALL_PRODUCTS,
+  cart: { items:[], bbq:{items:[],total:0,cutoff:'17:00'}, veg:{items:[],total:0,cutoff:'22:00'}, total:0 },
+  orders: DEMO_ORDERS,
+  user: { id:1, nickname:'吃货小李', user_type:'regular', level:1 },
+  catFilter:0,
+  lineFilter:'bbq',
+  currentTab:'products'
+};
+
+function emoji(id) { return EMOJIS[id % EMOJIS.length]; }
+function fmtTime(t) { return t||''; }
+
+function showToast(msg) {
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),1800);
+}
+
+function switchTab(tab) {
+  state.currentTab=tab;
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  document.querySelectorAll('.tab-item').forEach((el,i)=>el.classList.toggle('active',['products','cart','orders','profile'][i]===tab));
+  if(tab==='products')renderProducts();
+  if(tab==='cart')renderCart();
+  if(tab==='orders')renderOrders();
+  if(tab==='profile')renderProfile();
+}
+
+function renderCategories() {
+  let html=`<div class="cat-tab ${state.catFilter===0?'active':''}" onclick="setCat(0)">全部</div>`;
+  for(const c of state.categories){
+    html+=`<div class="cat-tab ${state.catFilter===c.id?'active':''}" onclick="setCat(${c.id})">${c.icon||'📁'} ${c.name}</div>`;
+  }
+  document.getElementById('categoryTabs').innerHTML=html;
+}
+
+function getFiltered() {
+  let list=state.products;
+  if(state.catFilter>0)list=list.filter(p=>p.category_id===state.catFilter);
+  if(state.lineFilter)list=list.filter(p=>p.line_type===state.lineFilter);
+  return list;
+}
+
+function renderProducts() {
+  const list=getFiltered();
+  if(list.length===0){
+    document.getElementById('productGrid').innerHTML='<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-light)">暂无商品</div>';
+    return;
+  }
+  let html='';
+  for(const p of list){
+    const price=state.user.user_type==='pro'?p.pro_price:p.regular_price;
+    const origPrice=state.user.user_type==='pro'?p.regular_price:null;
+    const isLow=p.stock<=0||p.stock<=(p.initial_stock||999)*0.1;
+    const stockText=p.stock<=0?'❌ 已售罄':isLow?`⚠️ 仅剩${p.stock}${p.unit}`:`库存${p.stock}`;
+    html+=`<div class="product-card">
+      <div class="product-img">${emoji(p.id)}</div>
+      <div class="product-info">
+        <span class="cat-label">${p.line_type==='bbq'?'🔥烧烤':'🥬净菜'}</span>
+        <div class="product-name">${p.name}</div>
+        <div class="product-unit">${p.unit} · 截单${p.cutoff_time||'17:00'}</div>
+        <div class="product-price-row">
+          <div>
+            <span class="price-current"><span class="currency">¥</span>${price}</span>
+            ${origPrice&&origPrice>price?`<span class="price-original">¥${origPrice}</span>`:''}
+            <div style="font-size:10px;color:${p.stock<=0?'var(--red)':isLow?'#f59e0b':'var(--text-light)'};margin-top:2px">${stockText}</div>
+          </div>
+          <button class="product-add" onclick="addToCart(${p.id})" ${p.stock<=0?'disabled style="background:#ccc"':''}>+</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('productGrid').innerHTML=html;
+}
+
+function setCat(id){state.catFilter=id;renderCategories();renderProducts();}
+
+function setLine(line){
+  state.lineFilter=line;
+  document.getElementById('line-bbq').className='line-btn'+(line==='bbq'?' active-bbq':'');
+  document.getElementById('line-veg').className='line-btn'+(line==='veg'?' active-veg':'');
+  renderProducts();
+}
+
+function addToCart(pid){
+  const p=state.products.find(x=>x.id===pid);
+  if(!p)return;
+  const price=state.user.user_type==='pro'?p.pro_price:p.regular_price;
+  const line=p.line_type;
+  const cart=state.cart[line];
+  const existing=cart.items.find(i=>i.id===pid);
+  if(existing){
+    existing.quantity++;
+    existing.display_price+=price;
+  }else{
+    cart.items.push({id:p.id,name:p.name,quantity:1,display_price:price,unit:p.unit});
+  }
+  cart.total+=price;
+  state.cart.total+=price;
+  updateBadge();
+  showToast(`已加入 ${p.name}`);
+}
+
+function updateBadge(){
+  const count=state.cart.bbq.items.reduce((s,i)=>s+i.quantity,0)+state.cart.veg.items.reduce((s,i)=>s+i.quantity,0);
+  const badge=document.getElementById('cartBadge');
+  if(count>0){badge.textContent=count;badge.style.display='inline';}else{badge.style.display='none';}
+}
+
+function renderCart(){
+  const c=state.cart;
+  const content=document.getElementById('cartContent');
+  const bottom=document.getElementById('cartBottom');
+  if(c.bbq.items.length===0&&c.veg.items.length===0){
+    content.innerHTML='<div class="cart-empty"><div class="empty-icon">🛒</div><p>购物车是空的</p><p style="font-size:12px;margin-top:6px">快去选点烧烤食材吧！</p></div>';
+    bottom.classList.remove('show');
+    return;
+  }
+  bottom.classList.add('show');
+  document.getElementById('cartTotal').textContent=c.total.toFixed(1).replace(/\.0$/,'');
+  let html='';
+  if(c.bbq.items.length>0){
+    html+=`<div class="cart-section"><div class="cart-section-header"><span>🔥 烧烤食材</span><span class="cutoff">⏰ 今日截单 17:00</span></div>`;
+    for(const item of c.bbq.items){
+      html+=`<div class="cart-item cart-line-bbq"><span class="cart-item-name">${item.name}</span><span class="cart-item-price">¥${item.display_price}</span><div class="cart-qty"><button class="qty-btn" onclick="changeQty('${item.id}','bbq',-1)">−</button><span class="qty-val">${item.quantity}</span><button class="qty-btn" onclick="changeQty('${item.id}','bbq',1)">+</button></div></div>`;
+    }
+    html+=`</div>`;
+  }
+  if(c.veg.items.length>0){
+    html+=`<div class="cart-section"><div class="cart-section-header"><span>🥬 净菜/饮品</span><span class="cutoff">⏰ 今日截单 22:00</span></div>`;
+    for(const item of c.veg.items){
+      html+=`<div class="cart-item cart-line-veg"><span class="cart-item-name">${item.name}</span><span class="cart-item-price">¥${item.display_price}</span><div class="cart-qty"><button class="qty-btn" onclick="changeQty('${item.id}','veg',-1)">−</button><span class="qty-val">${item.quantity}</span><button class="qty-btn" onclick="changeQty('${item.id}','veg',1)">+</button></div></div>`;
+    }
+    html+=`</div>`;
+  }
+  content.innerHTML=html;
+}
+
+function changeQty(id,line,delta){
+  const cart=state.cart[line];
+  const item=cart.items.find(i=>i.id==id);
+  if(!item)return;
+  if(delta===-1&&item.quantity===1){
+    cart.items=cart.items.filter(i=>i.id!=id);
+    cart.total-=item.display_price;
+    state.cart.total-=item.display_price;
+  }else if(delta===-1){
+    item.quantity--;
+    item.display_price-=item.display_price/(item.quantity+1);
+    cart.total-=item.display_price/(item.quantity);
+    state.cart.total-=item.display_price/(item.quantity);
+  }else{
+    const p=state.products.find(x=>x.id==id);
+    const price=state.user.user_type==='pro'?p.pro_price:p.regular_price;
+    item.quantity++;
+    item.display_price+=price;
+    cart.total+=price;
+    state.cart.total+=price;
+  }
+  updateBadge();renderCart();
+}
+
+function checkout(){
+  if(state.cart.bbq.items.length===0&&state.cart.veg.items.length===0){showToast('购物车是空的');return;}
+  const total=state.cart.total;
+  state.orders.unshift({
+    order_no:'BBQ'+Date.now().toString().slice(-10),
+    status:'paid',
+    items:[...state.cart.bbq.items.map(i=>({product_name:i.name+'×'+i.quantity,display_price:i.display_price})),...state.cart.veg.items.map(i=>({product_name:i.name+'×'+i.quantity,display_price:i.display_price}))],
+    pay_amount:total,
+    created_at:new Date().toLocaleString('zh-CN',{hour12:false}).replace('/','-').replace('/','-')
+  });
+  state.cart={items:[],bbq:{items:[],total:0,cutoff:'17:00'},veg:{items:[],total:0,cutoff:'22:00'},total:0};
+  updateBadge();
+  showToast('✅ 下单成功！');
+  switchTab('orders');
+}
+
+function renderOrders(){
+  const content=document.getElementById('orderContent');
+  if(state.orders.length===0){
+    content.innerHTML='<div class="order-empty"><div class="empty-icon">📋</div><p>暂无订单</p></div>';
+    return;
+  }
+  let html='';
+  for(const o of state.orders){
+    const names=o.items.map(i=>i.product_name).join('、');
+    html+=`<div class="order-card">
+      <div class="order-header"><span class="order-no">${o.order_no}</span><span class="order-status status-${o.status}">${STATUS_MAP[o.status]||o.status}</span></div>
+      <div class="order-items">${names.length>40?names.substring(0,40)+'...':names}</div>
+      <div class="order-total">¥${o.pay_amount}</div>
+      <div class="order-time">${fmtTime(o.created_at)}</div>
+    </div>`;
+  }
+  content.innerHTML=html;
+}
+
+function renderProfile(){
+  const u=state.user;
+  document.getElementById('profileContent').innerHTML=`
+    <div class="profile-card">
+      <div class="profile-avatar">${u.nickname?.[0]||'👤'}</div>
+      <div class="profile-name">${u.nickname||'游客'}</div>
+      <div class="profile-type">${u.user_type==='pro'?'🔴 专业客户（批发价）':'⚪ 普通客户'}</div>
+      <button class="profile-switch" onclick="toggleUserType()">切换为${u.user_type==='pro'?'普通':'专业'}客户</button>
+    </div>
+    <div class="profile-menu">
+      <div class="profile-menu-item" onclick="switchTab('orders')"><span>我的订单</span><span class="arrow">›</span></div>
+      <div class="profile-menu-item"><span>我的等级</span><span class="arrow">Lv${u.level||1}</span></div>
+      <div class="profile-menu-item" onclick="switchUser()"><span>切换账号</span><span class="arrow">›</span></div>
+    </div>
+  `;
+}
+
+function toggleUserType(){
+  state.user.user_type=state.user.user_type==='pro'?'regular':'pro';
+  renderProducts();renderProfile();
+  showToast(state.user.user_type==='pro'?'专业客户模式':'普通客户模式');
+}
+
+function switchUser(){
+  const users=[{id:1,nickname:'吃货小李',user_type:'regular',level:1},{id:2,nickname:'烧烤达人老王',user_type:'pro',level:3}];
+  const next=users.find(u=>u.id!==state.user.id)||users[0];
+  state.user=next;
+  renderProfile();renderProducts();
+  showToast(`已切换为 ${next.nickname}`);
+}
+
+renderCategories();renderProducts();renderProfile();
+renderOrders();
+</script>
+</body>
+</html>
